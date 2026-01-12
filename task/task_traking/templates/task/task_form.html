@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.9); max-width: 700px;">
+
+        <h2 class="text-center mb-4" style="color: #d18ab2;">
+            {% if form.instance.pk %}Редагування завдання{% else %}Створення нового завдання{% endif %}
+        </h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {{ form.as_p }}
+            </div>
+
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn pink-btn glow-link px-5">
+                    Зберегти
+                </button>
+
+                <a href="{% url 'task:task-list' %}" class="btn pink-btn glow-link px-4">
+                    Назад до списку
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

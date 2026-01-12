@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9);">
+        <h2 class="text-center mb-4">Редагувати коментар</h2>
+
+        <form action="" method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {{ form.as_p }}
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn pink-btn glow-link">
+                    Оновити коментар
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

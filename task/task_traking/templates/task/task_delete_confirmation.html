@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9); max-width: 600px;">
+        <h2 class="text-center mb-4">Видалення завдання</h2>
+
+        <p class="text-center fs-5">
+            Ви впевнені, що хочете видалити завдання <br>
+            <strong style="color: #f7b6d6;">"{{ object.title }}"</strong>?
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn pink-btn glow-link">
+                    Так, видалити
+                </button>
+            </form>
+
+            <a href="{% url 'task:task-list' %}" class="btn pink-btn glow-link">
+                Ні, скасувати
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

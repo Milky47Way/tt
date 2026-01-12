@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9);">
+        <h2 class="text-center mb-4">Ви впевнені, що хочете видалити цей коментар?</h2>
+
+        <div class="d-flex justify-content-center gap-3">
+            <form action="" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn pink-btn glow-link">
+                    Так, видалити
+                </button>
+            </form>
+
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn pink-btn glow-link">
+                Відміна
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

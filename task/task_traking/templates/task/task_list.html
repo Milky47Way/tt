@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #d18ab2; font-weight: bold;">Мої завдання</h2>
+        <a href="{% url 'task:task-create' %}" class="btn pink-btn glow-link px-4">
+            + Додати завдання
+        </a>
+    </div>
+
+    <div class="card shadow-sm p-3 mb-4" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.85);">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="fw-bold" style="color: #d18ab2;">{{ form.status.label_tag }}</label>
+            </div>
+            <div class="col-auto">
+                {{ form.status }}
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn pink-btn glow-link btn-sm">Фільтрувати</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        {% for task in tasks %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm task-card" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.9); transition: transform 0.3s;">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'task:task-detail' task.pk %}" class="text-decoration-none" style="color: #d18ab2; font-weight: bold;">
+                            {{ task.title }}
+                        </a>
+                    </h5>
+                    <div class="mb-3">
+                        <span class="badge rounded-pill {% if task.status == 'done' %}bg-success{% else %}bg-info text-dark{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                        <span class="badge rounded-pill {% if task.priority == 'high' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    {% if task.status != 'done' %}
+                    <form action="{% url 'task:task-complete' task.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn pink-btn glow-link btn-sm w-100">
+                            ✓ Виконано
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="btn btn-outline-success btn-sm w-100" disabled>
+                        Завершено
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center mt-5">
+            <div class="alert alert-light shadow-sm" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.8);">
+                <p class="fs-5 mb-0" style="color: #d18ab2;">Наразі завдань немає. Створіть перше! 🐾</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

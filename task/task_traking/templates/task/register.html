@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9); max-width: 450px;">
+        <h2 class="text-center mb-4">Реєстрація</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {{ form.as_p }}
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn pink-btn glow-link w-100">
+                    Зареєструватися
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>Вже маєте акаунт? <a href="{% url 'task:login' %}" style="color: #f7b6d6;">Увійти</a></small>
+        </div>
+    </div>
+</div>
+{% endblock %}
