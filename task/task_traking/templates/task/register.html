@@ -1,27 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9); max-width: 450px;">
-        <h2 class="text-center mb-4">Реєстрація</h2>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="card shadow-lg p-4 w-100" style="border-radius: 25px; background-color: rgba(255, 255, 255, 0.95); max-width: 500px; border: 2px solid #f7b6d6;">
+
+        <div class="text-center mb-4">
+            <h2 style="color: #f7b6d6; font-weight: bold;">Створення акаунта ✨</h2>
+            <p class="text-muted small">Приєднуйся до нашої затишної системи завдань</p>
+        </div>
 
         <form method="post">
             {% csrf_token %}
 
-            <div class="mb-3">
-                {{ form.as_p }}
+            <div class="register-form-fields">
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #d182a9; font-weight: 500;">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-text small text-muted" style="font-size: 0.75rem; line-height: 1.2;">
+                                {{ field.help_text|safe }}
+                            </div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in field.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
 
             <div class="text-center mt-4">
-                <button type="submit" class="btn pink-btn glow-link w-100">
-                    Зареєструватися
+                <button type="submit" class="btn pink-btn glow-link w-100 py-2" style="font-size: 1.1rem;">
+                    Стати котиком-майстром 🐾
                 </button>
             </div>
         </form>
 
+        <hr style="border-color: #f7b6d6; opacity: 0.3;">
+
         <div class="text-center mt-3">
-            <small>Вже маєте акаунт? <a href="{% url 'task:login' %}" style="color: #f7b6d6;">Увійти</a></small>
+            <p class="mb-1">Вже є профіль?</p>
+            <a href="{% url 'task:login' %}" class="fw-bold" style="color: #f7b6d6; text-decoration: none;">
+                Повернутися до входу 🏠
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+    /* Стилізація списків у help_text (Django автоматично створює <ul> для вимог до пароля) */
+    .register-form-fields ul {
+        padding-left: 15px;
+        margin-top: 5px;
+        list-style-type: '• ';
+    }
+
+    .register-form-fields input {
+        border: 1px solid #f7b6d6 !important;
+        border-radius: 12px !important;
+        padding: 10px !important;
+        transition: all 0.3s ease;
+    }
+
+    .register-form-fields input:focus {
+        box-shadow: 0 0 10px rgba(247, 182, 214, 0.4) !important;
+        background-color: #fffafc;
+    }
+</style>
 {% endblock %}

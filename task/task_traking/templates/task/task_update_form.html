@@ -1,31 +1,77 @@
-{% extends 'base.html' %}
+<div class="card shadow-lg p-4 mb-5" style="border-radius: 25px; background-color: rgba(255, 255, 255, 0.95); border: 2px solid #f7b6d6;">
+    <h4 class="mb-4" style="color: #d18ab2; font-weight: bold;">
+        Залишити коментар 🐾
+    </h4>
 
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.9); max-width: 700px;">
+    <form action="{% url 'task:task-detail' task.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-        <h2 class="text-center mb-4" style="color: #d18ab2; font-weight: bold;">
-            Оновлення завдання
-        </h2>
-
-        <form method="post">
-            {% csrf_token %}
-
+        {% for field in comment_form %}
             <div class="mb-3">
-                {{ form.as_p }}
-            </div>
+                <label class="form-label" style="color: #d182a9; font-weight: 600;">
+                    {% if field.name == 'content' %} 💭 {% elif field.name == 'media' %} 📸 {% endif %}
+                    {{ field.label }}
+                </label>
 
-            <div class="d-flex justify-content-center gap-3 mt-4">
-                <button type="submit" class="btn pink-btn glow-link px-5">
-                    Зберегти зміни
-                </button>
+                <div class="comment-input-wrapper">
+                    {{ field }}
+                </div>
 
-                <a href="{% url 'task:task-list' %}" class="btn pink-btn glow-link px-4">
-                    Скасувати
-                </a>
+                {% if field.help_text %}
+                    <div class="form-text small" style="color: #f7b6d6; font-style: italic;">
+                        {{ field.help_text|safe }}
+                    </div>
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
             </div>
-        </form>
-    </div>
+        {% endfor %}
+
+        <button type="submit" class="btn pink-btn glow-link w-100 py-2 mt-2" style="font-size: 1.1rem; border-radius: 15px;">
+            Надіслати відгук ✨
+        </button>
+    </form>
 </div>
-{% endblock %}
 
+<style>
+    /* Стилізація текстових полів та вибору файлів */
+    .comment-input-wrapper input,
+    .comment-input-wrapper textarea,
+    .comment-input-wrapper input[type="file"] {
+        width: 100%;
+        border: 1px solid #f7b6d6 !important;
+        border-radius: 12px !important;
+        padding: 10px 15px !important;
+        background-color: #fff !important;
+        transition: all 0.3s ease;
+        color: #555;
+    }
+
+    /* Окремий стиль для кнопки вибору файлу всередині input */
+    .comment-input-wrapper input[type="file"]::file-selector-button {
+        background-color: #f7b6d6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 5px 15px;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .comment-input-wrapper input[type="file"]::file-selector-button:hover {
+        background-color: #f8c3de;
+    }
+
+    .comment-input-wrapper input:focus,
+    .comment-input-wrapper textarea:focus {
+        box-shadow: 0 0 10px rgba(247, 182, 214, 0.4) !important;
+        outline: none !important;
+        background-color: #fffafc !important;
+        border-color: #d18ab2 !important;
+    }
+</style>

@@ -48,7 +48,7 @@
                     <form action="{% url 'task:task-complete' task.pk %}" method="post">
                         {% csrf_token %}
                         <button type="submit" class="btn pink-btn glow-link btn-sm w-100">
-                            ✓ Виконано
+                            Виконано
                         </button>
                     </form>
                     {% else %}
@@ -56,13 +56,20 @@
                         Завершено
                     </button>
                     {% endif %}
+
+                    <form action="{% url 'task:task-delete' task.id %}" method="post" onsubmit="return confirm('Точно видалити котика-завдання? 🐾');" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm" style="color: #ff69b4; border: none; background: none;">
+         Видалити
+    </button>
+</form>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center mt-5">
             <div class="alert alert-light shadow-sm" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.8);">
-                <p class="fs-5 mb-0" style="color: #d18ab2;">Наразі завдань немає. Створіть перше! 🐾</p>
+                <p class="fs-5 mb-0" style="color: #d18ab2;">Наразі завдань немає. Створіть перше </p>
             </div>
         </div>
         {% endfor %}

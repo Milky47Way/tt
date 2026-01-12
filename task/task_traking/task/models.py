@@ -50,4 +50,4 @@ class Like(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('comment', 'user')  # Забезпечує унікальність лайків
+        unique_together = ('comment', 'user')

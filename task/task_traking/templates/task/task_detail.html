@@ -1,70 +1,49 @@
-{% extends 'base.html' %}
-{% load custom_tags %}
+<div class="card shadow-lg p-4 mb-5" style="border-radius: 25px; background-color: rgba(255, 255, 255, 0.95); border: 2px solid #f7b6d6;">
+    <h4 class="mb-4" style="color: #d18ab2; font-weight: bold;">Залишити коментар 🐾</h4>
+    
+    <form action="{% url 'task:task-detail' task.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm p-4 mb-4" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.9);">
-        <h2 class="mb-3" style="color: #d18ab2;">{{ task.title }}</h2>
-        <p class="fs-5">{{ task.description }}</p>
+        {% for field in comment_form %}
+            <div class="mb-3">
+                <label class="form-label" style="color: #d182a9; font-weight: 500;">
+                    {{ field.label }}
+                </label>
+                
+                <div class="comment-input-wrapper">
+                    {{ field }}
+                </div>
 
-        <div class="mb-4">
-            <span class="badge rounded-pill p-2 px-3" style="background-color: #f7b6d6;">Статус: {{ task.get_status_display|default:task.status }}</span>
-            <span class="badge rounded-pill p-2 px-3 bg-secondary">Пріоритет: {{ task.priority }}</span>
-        </div>
-
-        <div class="d-flex gap-2">
-            <a href="{% url 'task:task-update' task.id %}" class="btn pink-btn glow-link">Редагувати</a>
-            <a href="{% url 'task:task-delete' task.id %}" class="btn pink-btn glow-link">Видалити</a>
-        </div>
-    </div>
-
-    <div class="card shadow-sm p-4 mb-4" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.85);">
-        <h3 class="mb-4" style="color: #d18ab2;">Коментарі</h3>
-
-        {% for comment in task.comments.all %}
-            <div class="comment-item p-3 mb-3 border-bottom">
-                <p class="mb-2">{{ comment.content }}</p>
-
-                {% if comment.media %}
-                    <div class="comment-media mb-2">
-                        {% if comment.media.url|endswith:".jpg" or comment.media.url|endswith:".png" or comment.media.url|endswith:".jpeg" %}
-                            <img src="{{ comment.media.url }}" alt="Зображення" class="img-fluid rounded shadow-sm" style="max-height: 500px;">
-                        {% elif comment.media.url|endswith:".mp4" %}
-                            <video class="w-100 rounded shadow-sm" controls>
-                                <source src="{{ comment.media.url }}" type="video/mp4">
-                                Ваш браузер не підтримує відео.
-                            </video>
-                        {% else %}
-                            <a href="{{ comment.media.url }}" class="btn btn-sm pink-btn glow-link">Завантажити файл</a>
-                        {% endif %}
+                {% if field.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ field.errors }}
                     </div>
                 {% endif %}
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">Автор: <strong>{{ comment.author.username }}</strong></small>
-
-                    <form action="{% url 'task:comment-like-toggle' comment.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm pink-btn glow-link">
-                            ❤️ {{ comment.likes.count }}
-                        </button>
-                    </form>
-                </div>
             </div>
-        {% empty %}
-            <p class="text-muted">Коментарів поки що немає. Будьте першим!</p>
         {% endfor %}
-    </div>
 
-    <div class="card shadow-sm p-4 mb-5" style="border-radius: 20px; background-color: rgba(255, 255, 255, 0.95);">
-        <h4 class="mb-3" style="color: #d18ab2;">Додати коментар</h4>
-        <form action="{% url 'task:task-detail' task.id %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group mb-3">
-                {{ comment_form.as_p }}
-            </div>
-            <button type="submit" class="btn pink-btn glow-link w-100">Відправити коментар</button>
-        </form>
-    </div>
+        <button type="submit" class="btn pink-btn glow-link w-100 py-2 mt-2" style="font-size: 1.1rem; border-radius: 15px;">
+            Надіслати відгук
+        </button>
+    </form>
 </div>
-{% endblock %}
+
+<style>
+    /* Додаткові стилі для полів форми всередині цієї картки */
+    .comment-input-wrapper input, 
+    .comment-input-wrapper textarea {
+        width: 100%;
+        border: 1px solid #f7b6d6 !important;
+        border-radius: 12px !important;
+        padding: 10px 15px !important;
+        background-color: #fff !important;
+        transition: all 0.3s ease;
+    }
+
+    .comment-input-wrapper input:focus, 
+    .comment-input-wrapper textarea:focus {
+        box-shadow: 0 0 10px rgba(247, 182, 214, 0.4) !important;
+        outline: none !important;
+        background-color: #fffafc !important;
+    }
+</style>

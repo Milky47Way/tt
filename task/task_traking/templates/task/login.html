@@ -1,27 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm p-4 mx-auto" style="border-radius: 15px; background-color: rgba(255, 255, 255, 0.9); max-width: 400px;">
-        <h2 class="text-center mb-4">Вхід до системи</h2>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-lg p-4 w-100" style="border-radius: 25px; background-color: rgba(255, 255, 255, 0.95); max-width: 450px; border: 2px solid #f7b6d6;">
+
+        <div class="text-center mb-4">
+            <h2 style="color: #f7b6d6; font-weight: bold;">З поверненням! ✨</h2>
+            <p class="text-muted small">Будь ласка, увійдіть у свій акаунт</p>
+        </div>
 
         <form method="post">
             {% csrf_token %}
 
-            <div class="mb-3">
-                {{ form.as_p }}
+            <div class="login-form-fields">
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #d182a9; font-weight: 500;">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
 
             <div class="text-center mt-4">
-                <button type="submit" class="btn pink-btn glow-link w-100">
-                    Увійти
+                <button type="submit" class="btn pink-btn glow-link w-100 py-2" style="font-size: 1.1rem;">
+                    Увійти 🐾
                 </button>
             </div>
         </form>
 
+        <hr style="border-color: #f7b6d6; opacity: 0.3;">
+
         <div class="text-center mt-3">
-            <small>Ще не маєте акаунта? <a href="{% url 'task:register' %}" style="color: #f7b6d6;">Зареєструватися</a></small>
+            <p class="mb-1">Ще не маєте акаунта?</p>
+            <a href="{% url 'task:register' %}" class="fw-bold" style="color: #f7b6d6; text-decoration: none;">
+                Створити магічний профіль ✨
+            </a>
         </div>
     </div>
 </div>
-{% endblock %}}
+
+<style>
+    /* Додаткове стилювання саме для цієї сторінки, якщо потрібно */
+    .login-form-fields input {
+        border: 1px solid #f7b6d6 !important;
+        border-radius: 12px !important;
+        padding: 12px !important;
+        transition: all 0.3s ease;
+    }
+
+    .login-form-fields input:focus {
+        box-shadow: 0 0 10px rgba(247, 182, 214, 0.4) !important;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

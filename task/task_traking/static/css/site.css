@@ -4,8 +4,10 @@ html, body {
 }
 
 body {
-    background: url("https://i.pinimg.com/736x/bc/18/9d/bc189d973dd82746f6ee5a820e7b4c9f.jpg");
+    background: url("https://i.pinimg.com/1200x/04/5b/28/045b280ad49085b54ab38edb6dbd6e0b.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #fce4ec !important;
 }

@@ -1,17 +1,35 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from . import models
+from task import models
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import TaskForm, TaskFilterForm, CommentForm
 from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+
 from .mixins import UserIsOwnerMixin
 
-# Деталі завдання та додавання коментарів
+class TaskListView(ListView):
+    model = models.Task
+    context_object_name = "tasks"
+    template_name = "task/task_list.html"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status = self.request.GET.get("status", "")
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = TaskFilterForm(self.request.GET)
+        return context
+
 class TaskDetailView(LoginRequiredMixin, DetailView):
     model = models.Task
     context_object_name = "task"
@@ -23,7 +41,6 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-
         comment_form = CommentForm(request.POST, request.FILES)
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
@@ -31,27 +48,90 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
             comment.task = self.get_object()
             comment.save()
             return redirect('task:task-detail', pk=comment.task.pk)
-        return self.get(request, *args, **kwargs)
+        return self.render_to_response(self.get_context_data(comment_form=comment_form))
 
-# Редагування коментаря (тут можна змінити фото)
+
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    model = models.Task
+    template_name = "task/task_form.html"
+    form_class = TaskForm
+    success_url = reverse_lazy("task:task-list")
+
+    def form_valid(self, form):
+        form.instance.creator = self.request.user
+        return super().form_valid(form)
+
+
+class TaskCompleteView(LoginRequiredMixin, UserIsOwnerMixin, View):
+    def post(self, request, *args, **kwargs):
+        task = self.get_object()
+        task.status = "done"
+        task.save()
+        return HttpResponseRedirect(reverse_lazy("task:task-list"))
+
+    def get_object(self):
+        task_id = self.kwargs.get("pk")
+        return get_object_or_404(models.Task, pk=task_id)
+
+class TaskUpdateView(LoginRequiredMixin, UserIsOwnerMixin, UpdateView):
+    model = models.Task
+    form_class = TaskForm
+    template_name = "task/task_form.html"
+    success_url = reverse_lazy("task:task-list")
+
+class TaskDeleteView(LoginRequiredMixin, UserIsOwnerMixin, DeleteView):
+    model = models.Task
+    success_url = reverse_lazy("task:task-list")
+    template_name = "task/task_delete_confirmation.html"
+
+
 class CommentUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Comment
-    fields = ['content', 'media']
+    fields = ['content']
     template_name = 'task/edit_comment.html'
 
     def form_valid(self, form):
-        if self.get_object().author != self.request.user:
-            raise PermissionDenied
+        comment = self.get_object()
+        if comment.author != self.request.user:
+            raise PermissionDenied("Ви не можете редагувати цей коментар.")
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('task:task-detail', kwargs={'pk': self.object.task.pk})
 
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Comment
+    template_name = 'task/delete_comment.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(author=self.request.user)
+
+    def get_success_url(self):
+        return reverse_lazy('task:task-detail', kwargs={'pk': self.object.task.pk})
 
 class CommentLikeToggle(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        comment = get_object_or_404(models.Comment, pk=pk)
-        like, created = models.Like.objects.get_or_create(comment=comment, user=request.user)
-        if not created:
-            like.delete()
-        return HttpResponseRedirect(comment.get_absolute_url())
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(models.Comment, pk=self.kwargs.get('pk'))
+        like_qs = models.Like.objects.filter(comment=comment, user=request.user)
+        if like_qs.exists():
+            like_qs.delete()
+        else:
+            models.Like.objects.create(comment=comment, user=request.user)
+        return HttpResponseRedirect(comment.task.get_absolute_url())
+
+class CustomLoginView(LoginView):
+    template_name = "task/login.html"
+    redirect_authenticated_user = True
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy("task:login")
+
+class RegisterView(CreateView):
+    template_name = "task/register.html"
+    form_class = UserCreationForm
+    success_url = reverse_lazy("task:task-list")
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect(self.success_url)
